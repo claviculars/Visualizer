@@ -1,0 +1,154 @@
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--bg-primary);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  color: var(--accent-color);
+}
+
+.header-controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.product-selector {
+  min-width: 200px;
+}
+
+main {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.plot-container {
+  height: 500px;
+  position: relative;
+}
+
+.pnl-container {
+  height: 300px;
+  position: relative;
+}
+
+.dropzone-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+}
+
+.dropzone-box {
+  width: 100%;
+  max-width: 600px;
+  padding: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  background: var(--bg-glass);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-align: center;
+}
+
+.dropzone-box:hover, .dropzone-box.dragging {
+  border-color: var(--accent-color);
+  background: rgba(59, 130, 246, 0.05);
+  transform: scale(1.02);
+}
+
+.dropzone-icon {
+  width: 64px;
+  height: 64px;
+  color: var(--text-muted);
+  transition: color 0.3s;
+}
+
+.dropzone-box:hover .dropzone-icon {
+  color: var(--accent-color);
+}
+
+.control-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.indicator-toggles {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.indicator-toggles label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.indicator-toggles label:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.custom-tooltip {
+  background: rgba(15, 15, 20, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+.custom-tooltip p {
+  margin: 4px 0;
+  font-size: 0.875rem;
+}
+
+.label-bold {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.value-bid { color: var(--bid-color); }
+.value-ask { color: var(--ask-color); }
+.value-mid { color: var(--mid-color); }
+.value-default { color: var(--text-secondary); }
