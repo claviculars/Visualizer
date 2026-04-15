@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 
-const MainPlot = ({ timeline, trades, filters, activeIndicators }) => {
+const MainPlot = ({ timeline, trades, filters, activeIndicators, movingAverages = [] }) => {
   const option = useMemo(() => {
     if (!timeline || timeline.length === 0) return {};
 
@@ -58,6 +58,50 @@ const MainPlot = ({ timeline, trades, filters, activeIndicators }) => {
       data: midPriceData
     });
 
+    // Volume overlays on secondary y-axis
+    const bidVolData = timeline.map(row => {
+      const v = (row.bid_volume_1 || 0) + (row.bid_volume_2 || 0) + (row.bid_volume_3 || 0);
+      return [row.timestamp, v];
+    });
+    const askVolData = timeline.map(row => {
+      const v = (row.ask_volume_1 || 0) + (row.ask_volume_2 || 0) + (row.ask_volume_3 || 0);
+      return [row.timestamp, v];
+    });
+    series.push({
+      name: 'Bid Volume',
+      type: 'line',
+      symbol: 'none',
+      yAxisIndex: 1,
+      lineStyle: { width: 1, color: 'rgba(59, 130, 246, 0.5)' },
+      areaStyle: {
+        color: {
+          type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+          colorStops: [
+            { offset: 0, color: 'rgba(59, 130, 246, 0.15)' },
+            { offset: 1, color: 'rgba(59, 130, 246, 0)' }
+          ]
+        }
+      },
+      data: filters.bidVolume ? bidVolData : []
+    });
+    series.push({
+      name: 'Ask Volume',
+      type: 'line',
+      symbol: 'none',
+      yAxisIndex: 1,
+      lineStyle: { width: 1, color: 'rgba(239, 68, 68, 0.5)' },
+      areaStyle: {
+        color: {
+          type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+          colorStops: [
+            { offset: 0, color: 'rgba(239, 68, 68, 0.15)' },
+            { offset: 1, color: 'rgba(239, 68, 68, 0)' }
+          ]
+        }
+      },
+      data: filters.askVolume ? askVolData : []
+    });
+
     // Find all custom indicators statically present in this timeline to ensure identical array mappings.
     // This prevents series from silently sticking on the graph due to variable element counts!
     const availableIndicators = [];
@@ -95,6 +139,48 @@ const MainPlot = ({ timeline, trades, filters, activeIndicators }) => {
     const myBuys = [];
     const mySells = [];
     const marketTradesData = [];
+
+    // Moving Averages on configurable metrics
+    movingAverages.forEach(ma => {
+      const { period, metric, metricLabel, color } = ma;
+      const maData = [];
+      let sum = 0;
+
+      // Extract the raw values based on the chosen metric
+      const rawValues = timeline.map(row => {
+        if (metric === 'bid_volume') {
+          return (row.bid_volume_1 || 0) + (row.bid_volume_2 || 0) + (row.bid_volume_3 || 0);
+        }
+        if (metric === 'ask_volume') {
+          return (row.ask_volume_1 || 0) + (row.ask_volume_2 || 0) + (row.ask_volume_3 || 0);
+        }
+        if (metric === 'spread') {
+          return (row.ask_price_1 != null && row.bid_price_1 != null) ? row.ask_price_1 - row.bid_price_1 : 0;
+        }
+        return row[metric] || 0;
+      });
+
+      for (let i = 0; i < rawValues.length; i++) {
+        sum += rawValues[i];
+        if (i >= period) sum -= rawValues[i - period];
+        if (i >= period - 1) {
+          maData.push([timeline[i].timestamp, sum / period]);
+        }
+      }
+
+      // Route volume/spread MAs to secondary y-axis
+      const useSecondaryAxis = ['bid_volume', 'ask_volume', 'spread'].includes(metric);
+
+      series.push({
+        name: `MA(${period}) ${metricLabel || metric}`,
+        type: 'line',
+        symbol: 'none',
+        smooth: true,
+        yAxisIndex: useSecondaryAxis ? 1 : 0,
+        lineStyle: { width: 2, color },
+        data: maData
+      });
+    });
 
     // Triage trades out.
     trades.forEach(t => {
@@ -237,7 +323,7 @@ const MainPlot = ({ timeline, trades, filters, activeIndicators }) => {
       ],
       series: series
     };
-  }, [timeline, trades, filters, activeIndicators]);
+  }, [timeline, trades, filters, activeIndicators, movingAverages]);
 
   if (!timeline || timeline.length === 0) {
     return (
@@ -251,7 +337,7 @@ const MainPlot = ({ timeline, trades, filters, activeIndicators }) => {
     <ReactECharts 
       option={option} 
       style={{ height: '100%', width: '100%' }} 
-      notMerge={false} 
+      notMerge={true} 
       opts={{ renderer: 'canvas' }} 
     />
   );
