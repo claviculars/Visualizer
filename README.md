@@ -1,16 +1,35 @@
-# React + Vite
+# Prosperity Visualizer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite app for exploring Prosperity / IMC backtest logs directly in the browser.
 
-Currently, two official plugins are available:
+The app is fully client-side:
+- upload a `.log` or `.json` file
+- inspect price, PnL, book depth, trades, and custom indicators
+- no backend or server storage required
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Local development
 
-## React Compiler
+```bash
+npm install
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## GitHub Pages deployment
 
-## Expanding the ESLint configuration
+This repository now includes a GitHub Actions workflow at `.github/workflows/deploy.yml` that builds and publishes the site from `main`.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+After pushing these changes to GitHub, do this once in the repository settings:
+
+1. Open `Settings -> Pages`.
+2. Under `Build and deployment`, set `Source` to `GitHub Actions`.
+3. Push to `main` or run the workflow manually from the `Actions` tab.
+
+Expected site URL:
+
+```text
+https://claviculars.github.io/Visualizer/
+```
+
+## Important note
+
+If GitHub Pages is still configured to publish directly from a branch, it may serve the raw Vite source files instead of the built app. If you see `/src/main.jsx` in the published HTML, the Pages source is still pointing at a branch and should be switched to `GitHub Actions`.
